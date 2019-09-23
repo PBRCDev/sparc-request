@@ -32,12 +32,14 @@ module ApplicationHelper
       phone.gsub!(/[^0-9#]/, '')
 
       formatted = ""
-      begin
-        formatted += "(#{phone.first(3)})"
-        formatted += " #{phone.from(3).to(2)}"
-        formatted += "-#{phone.from(6).to(3)}"
-        formatted += phone.from(10).gsub('#', " #{I18n.t('constants.phone.extension')} ") if phone.include?('#')
-      rescue
+      if !phone.empty?
+        begin
+          formatted += "(#{phone.first(3)})"
+          formatted += " #{phone.from(3).to(2)}"
+          formatted += "-#{phone.from(6).to(3)}"
+          formatted += phone.from(10).gsub('#', " #{I18n.t('constants.phone.extension')} ") if phone.include?('#')
+        rescue
+        end
       end
 
       return formatted

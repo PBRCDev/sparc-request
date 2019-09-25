@@ -38,8 +38,7 @@ $("[name='project_role[identity_attributes][<%= attr.to_s %>]']").parents('.form
 $("#protocolSummaryCard").replaceWith("<%= j render 'protocols/summary', protocol: @protocol, protocol_type: @protocol_type, permission_to_edit: @permission_to_edit, admin: @admin %>")
 $("#authorizedUsersCard").replaceWith("<%= j render 'associated_users/table', protocol: @protocol, permission_to_edit: @permission_to_edit || @admin %>")
 $("#documentsCard").replaceWith("<%= j render 'documents/table', protocol: @protocol, permission_to_edit: @permission_to_edit || @admin  %>")
-$('.service-request-card:not(:first-of-type').remove()
-$(".service-request-card:first-of-type").replaceWith("<%= j render 'dashboard/service_requests/service_requests', protocol: @protocol, permission_to_edit: @permission_to_edit %>")
+$("#serviceRequestCard").replaceWith("<%= j render 'dashboard/service_requests/service_requests', protocol: @protocol, permission_to_edit: @permission_to_edit %>")
 
 $("#authorizedUsersTable").bootstrapTable()
 $("#documentsTable").bootstrapTable()

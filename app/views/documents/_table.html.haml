@@ -23,7 +23,7 @@
     %h3.mb-0
       = icon('fas', 'caret-down pr-1 mr-2')
       = t('documents.header')
-  .collapse#documents{ class: controller_name == 'service_requests' && service_request.previously_submitted? ? '' : 'show' }
+  .collapse.show#documents{ class: controller_name == 'service_requests' && service_request.previously_submitted? ? '' : 'show' }
     #documentsTableToolbar
       - if in_dashboard?
         = new_document_button(protocol_id: protocol.id, permission: permission_to_edit)

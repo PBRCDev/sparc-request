@@ -20,44 +20,23 @@
 
 require 'rails_helper'
 
-RSpec.describe 'RMID validated Protocol', js: true do
-  let!(:user) do
-    create(:identity,
-           last_name: "Doe",
-           first_name: "John",
-           ldap_uid: "johnd",
-           email: "johnd@musc.edu",
-           password: "p4ssword",
-           password_confirmation: "p4ssword",
-           approved: true)
-  end
+RSpec.describe 'User clicks Requests button', js: true do
+  let_there_be_lane
+  fake_login_for_each_test
 
-  fake_login_for_each_test("johnd")
+  let!(:protocol) { create(:unarchived_study_without_validations, primary_pi: jug2) }
+  let!(:service_request) { create(:service_request_without_validations, protocol: protocol, status: 'draft') }
+  let!(:organization) { create(:organization, :process_ssrs, admin: jug2, type: 'Institution') }
+  let!(:sub_service_request) { create(:sub_service_request, ssr_id: '1234', service_request: service_request, status: 'draft', organization_id: organization.id, protocol_id: protocol.id) }
 
-  def visit_protocols_index_page
-    page = Dashboard::Protocols::IndexPage.new
-    page.load
-    page
-  end
+  it 'should display the requests modal' do
+    visit dashboard_root_path
+    wait_for_javascript_to_finish
 
-  stub_config("research_master_enabled", true)
-  
-  describe 'RMID validated Protocol' do
-    before(:each) do
-      create(:super_user, identity_id: user.id, access_empty_protocols: true)
-    end
+    click_link Protocol.human_attribute_name(:requests)
+    wait_for_javascript_to_finish
 
-    scenario 'User sees updated RMID validated Protocol' do
-      create(:study_without_validations,
-             primary_pi: user,
-             rmid_validated: true
-            )
-
-      page = visit_protocols_index_page
-
-      expect(page).to have_css('h6.text-success', text:
-                               'Updated to corresponding Research Master ID Short Title'
-                              )
-    end
+    expect(page).to have_selector('#protocolRequestsModal')
+    expect(page).to have_selector('.service-requests-table')
   end
 end

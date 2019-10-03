@@ -17,18 +17,35 @@
 # DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-module Surveyor::QuestionsHelper
-  def display_question_example(question, example_type)
-    options = {
-      text: 'text', email: 'text', zipcode: 'text', time: 'time', phone: 'text',
-      textarea: 'textarea', yes_no: 'yes_no', state: 'dropdown', country: 'dropdown',
-      date: 'date', number: 'number'
-    }
 
-    if options[question.question_type.to_sym]
-      options[question.question_type.to_sym] == example_type ? "" : "hidden"
-    else
-      example_type == 'custom' ? "" : "hidden"
-    end
+require 'rails_helper'
+
+RSpec.describe 'User wants to make a new Study', js: true do
+  let_there_be_lane
+  fake_login_for_each_test
+  build_study_type_question_groups
+  build_study_type_questions
+
+  stub_config("use_epic", true)
+
+  before :each do
+    visit dashboard_root_path
+    click_button I18n.t('dashboard.protocols.new')
+    click_link I18n.t('protocols.new', protocol_type: Study.model_name.human)
+  end
+
+  it 'should create a new Study' do
+    fill_in 'protocol_short_title', with: 'asd'
+    fill_in 'protocol_title', with: 'asd'
+    bootstrap_typeahead '#primary_pi', 'Julia'
+    find("[for='protocol_selected_for_epic_false']").click
+    bootstrap_select '#protocol_funding_status', 'Funded'
+    bootstrap_select '#protocol_funding_source', 'Federal'
+    fill_in 'protocol_sponsor_name', with: 'asd'
+
+    click_button I18n.t('actions.save')
+    wait_for_javascript_to_finish
+
+    expect(page).to have_current_path(dashboard_protocol_path(Protocol.last))
   end
 end

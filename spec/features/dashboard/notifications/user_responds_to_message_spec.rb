@@ -20,52 +20,44 @@
 
 require 'rails_helper'
 
-RSpec.feature 'User wants to edit a document', js: true do
-  let!(:logged_in_user) { create(:identity, last_name: "Doe", first_name: "John", ldap_uid: "johnd", email: "johnd@musc.edu", password: "p4ssword", password_confirmation: "p4ssword", approved: true) }
+RSpec.describe "User responds to a message", js: true do
+  let_there_be_lane
+  fake_login_for_each_test
 
-  fake_login_for_each_test("johnd")
+  let(:other_user) { create(:identity) }
 
-  before :each do
-    @protocol = create(:unarchived_study_without_validations, primary_pi: logged_in_user)
-                create(:document, protocol: @protocol, doc_type: 'Protocol')
+  it 'should create a new message' do
+    protocol      = create(:study_federally_funded, primary_pi: jug2)
+    sr            = create(:service_request, protocol: protocol)
+    ssr           = create(:sub_service_request, service_request: sr, protocol: protocol, organization: create(:organization))
+    notification  = create(:notification, originator: other_user, other_user: jug2, sub_service_request: ssr)
+                    create(:message, sender: other_user, recipient: jug2, notification: notification, body: 'Hello there')
 
-    @page = Dashboard::Protocols::ShowPage.new
-    @page.load(id: @protocol.id)
+    visit root_path
     wait_for_javascript_to_finish
-  end
 
-  context 'and clicks the Edit button' do
-    before :each do
-      @page.documents.first.enabled_edit_button.click
-      wait_for_javascript_to_finish
-    end
+    expect(page).to have_selector('.profile .notification-badge')
 
-    scenario 'and sees the document modal' do
-      expect(@page).to have_document_modal
-    end
+    find('#profileDropdown').hover
+    find('#profileDropdown + .dropdown-menu .dropdown-item#userMessages').click
+    wait_for_javascript_to_finish
 
-    context 'and edits a field and submits' do
-      before :each do
-        edit_document_fields
-        wait_for_javascript_to_finish
-      end
+    expect(page).to have_selector('#notifications-table tbody tr', count: 1)
 
-      scenario 'and sees the updated document' do
-        wait_for_javascript_to_finish
-        expect(@page).to have_documents(text: 'Consent')
-      end
-    end
-  end
+    # Capybara doesn't like to click td elements
+    first('#notifications-table tbody tr td.subject span').click
+    wait_for_javascript_to_finish
 
-  def edit_document_fields
-    @page.document_modal.instance_exec do
-      doc_type_dropdown.click
-      wait_until_dropdown_choices_visible
-      dropdown_choices(text: 'Consent').first.click
-    end
+    expect(page).to have_no_selector('.profile .notification-badge')
 
-    attach_file 'document_document', File.expand_path('spec/fixtures/files/text_document.txt')
+    fill_in 'message_body', with: 'General Kenobi'
 
-    @page.document_modal.upload_button.click
+    click_button I18n.t('actions.reply')
+    wait_for_javascript_to_finish
+
+    expect(notification.reload.messages.count).to eq(2)
+    expect(jug2.reload.sent_messages.count).to eq(1)
+    expect(other_user.reload.received_messages.count).to eq(1)
+    expect(page).to have_selector('.card-callout p', text: 'General Kenobi')
   end
 end

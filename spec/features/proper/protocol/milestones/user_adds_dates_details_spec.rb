@@ -18,50 +18,35 @@
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-module Dashboard::ProtocolsHelper
-  def break_before_parenthetical(s)
-    i = s.index('(')
-    if i.present?
-      beginning = s[0...i]
-      ending = s[i..-1]
-      raw(beginning +'<br>'+ ending)
-    else
-      s
-    end
+require 'rails_helper'
+
+RSpec.describe 'User sets milestone dates', js: true do
+  let_there_be_lane
+
+  fake_login_for_each_test
+
+  before :each do
+    org       = create(:organization, name: "Program", process_ssrs: true, pricing_setup_count: 1)
+    service   = create(:service, name: "Service", abbreviation: "Service", organization: org, pricing_map_count: 1)
+    @protocol = create(:study_federally_funded, primary_pi: jug2)
+    @sr       = create(:service_request_without_validations, status: 'draft', protocol: @protocol)
+    ssr       = create(:sub_service_request_without_validations, service_request: @sr, organization: org, status: 'draft')
+                create(:line_item, service_request: @sr, sub_service_request: ssr, service: service)
+
+    visit protocol_service_request_path(srid: @sr.id)
+    wait_for_javascript_to_finish
   end
 
-  def protocol_id_link(protocol)
-    link_to protocol.id, dashboard_protocol_path(protocol)
-  end
+  it 'should update the milestones' do
+    bootstrap_datepicker '#protocol_start_date', '01/02/2016'
+    first('.card-header').click
+    bootstrap_datepicker '#protocol_end_date', '03/04/2016'
+    first('.card-header').click
 
-  def protocol_short_title_link(protocol)
-    link_to protocol.short_title, dashboard_protocol_path(protocol)
-  end
+    click_button I18n.t('proper.navigation.bottom.save_and_continue.full')
+    wait_for_javascript_to_finish
 
-  def pis_display(protocol)
-    if protocol.primary_pi
-      content_tag(:div, title: Protocol.human_attribute_name(:primary_pi), data: { toggle: 'tooltip', boundary: 'window' }) do
-        content_tag(:span) do
-          icon('fas', 'user-circle mr-2') + protocol.primary_pi.display_name
-        end + '<br>'.html_safe
-      end
-    else
-      ""
-    end + raw(
-    protocol.principal_investigators.where.not(id: protocol.primary_pi).map do |pi|
-      content_tag(:span) do
-        icon('fas', 'user mr-2') + pi.display_name
-      end
-    end.join('<br>'.html_safe))
-  end
-
-  def display_requests_button(protocol, access)
-    if protocol.sub_service_requests.any? && access
-      link_to(display_requests_dashboard_protocol_path(protocol), remote: true, class: 'btn btn-secondary protocol-requests') do
-        content_tag :span, class: 'd-flex align-items-center' do
-          raw(Protocol.human_attribute_name(:requests) + content_tag(:span, protocol.sub_service_requests.count, class: 'badge badge-pill badge-c badge-light ml-2'))
-        end
-      end
-    end
+    expect(@protocol.reload.start_date.to_date).to eq('2/1/2016'.to_date)
+    expect(@protocol.reload.end_date.to_date).to eq('4/3/2016'.to_date)
   end
 end

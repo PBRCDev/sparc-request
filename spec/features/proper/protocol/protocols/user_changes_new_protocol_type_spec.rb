@@ -20,25 +20,27 @@
 
 require 'rails_helper'
 
-RSpec.feature 'User wants to edit a document', js: true do
-  let!(:logged_in_user) { create(:identity, last_name: "Doe", first_name: "John", ldap_uid: "johnd", email: "johnd@musc.edu", password: "p4ssword", password_confirmation: "p4ssword", approved: true) }
+RSpec.describe 'User wants to change a new Study to a Project', js: true do
+  let_there_be_lane
+  fake_login_for_each_test
+  build_study_type_question_groups
+  build_study_type_questions
 
-  fake_login_for_each_test("johnd")
+  before :each do
+    org     = create(:organization, name: "Program", process_ssrs: true, pricing_setup_count: 1)
+    service = create(:service, name: "Service", abbreviation: "Service", organization: org, pricing_map_count: 1)
+    @sr     = create(:service_request_without_validations, status: 'first_draft')
+    ssr     = create(:sub_service_request_without_validations, service_request: @sr, organization: org, status: 'first_draft')
+              create(:line_item, service_request: @sr, sub_service_request: ssr, service: service)
 
-  context 'and clicks the Delete button' do
-    scenario 'and sees the document removed' do
-      @protocol = create(:unarchived_study_without_validations, primary_pi: logged_in_user)
-                  create(:document, protocol: @protocol, doc_type: 'Protocol')
+    visit new_protocol_path(type: Study.name, srid: @sr.id)
+    wait_for_javascript_to_finish
+  end
 
-      @page = Dashboard::Protocols::ShowPage.new
-      @page.load(id: @protocol.id)
-      wait_for_javascript_to_finish
-
-      @page.documents.first.enabled_remove_button.click
-      accept_confirm
-      wait_for_javascript_to_finish
-
-      expect(@page.documents(text: 'Protocol').count).to eq(0)
-    end
+  it 'should change the Study to a Project' do
+    click_link I18n.t('protocols.change_type.link_text', current_type: Study.model_name.human, new_type: Project.name)
+    confirm_swal
+    wait_for_javascript_to_finish
+    expect(page).to have_current_path(new_protocol_path(type: Project.name, srid: @sr.id))
   end
 end

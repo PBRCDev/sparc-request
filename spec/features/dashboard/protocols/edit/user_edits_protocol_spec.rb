@@ -31,6 +31,7 @@ RSpec.describe 'User wants to edit a Protocol', js: true do
 
     visit dashboard_protocol_path(@protocol)
     click_link I18n.t('protocols.edit', protocol_type: @protocol.model_name.human)
+    wait_for_javascript_to_finish
   end
 
   it 'should update the Protocol' do

@@ -18,50 +18,29 @@
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-module Dashboard::ProtocolsHelper
-  def break_before_parenthetical(s)
-    i = s.index('(')
-    if i.present?
-      beginning = s[0...i]
-      ending = s[i..-1]
-      raw(beginning +'<br>'+ ending)
-    else
-      s
-    end
+require 'rails_helper'
+
+RSpec.feature 'User wants to edit a document', js: true do
+  let_there_be_lane
+  fake_login_for_each_test
+
+  before :each do
+    @protocol = create(:study_federally_funded, primary_pi: jug2)
+    @document = create(:document, protocol: @protocol, doc_type: 'budget')
+
+    visit dashboard_protocol_path(@protocol)
+    wait_for_javascript_to_finish
   end
 
-  def protocol_id_link(protocol)
-    link_to protocol.id, dashboard_protocol_path(protocol)
-  end
+  it 'should update the document' do
+    find('.edit-document').click
+    wait_for_javascript_to_finish
 
-  def protocol_short_title_link(protocol)
-    link_to protocol.short_title, dashboard_protocol_path(protocol)
-  end
+    bootstrap_select '#document_doc_type', 'Consent'
 
-  def pis_display(protocol)
-    if protocol.primary_pi
-      content_tag(:div, title: Protocol.human_attribute_name(:primary_pi), data: { toggle: 'tooltip', boundary: 'window' }) do
-        content_tag(:span) do
-          icon('fas', 'user-circle mr-2') + protocol.primary_pi.display_name
-        end + '<br>'.html_safe
-      end
-    else
-      ""
-    end + raw(
-    protocol.principal_investigators.where.not(id: protocol.primary_pi).map do |pi|
-      content_tag(:span) do
-        icon('fas', 'user mr-2') + pi.display_name
-      end
-    end.join('<br>'.html_safe))
-  end
+    click_button I18n.t('actions.submit')
+    wait_for_javascript_to_finish
 
-  def display_requests_button(protocol, access)
-    if protocol.sub_service_requests.any? && access
-      link_to(display_requests_dashboard_protocol_path(protocol), remote: true, class: 'btn btn-secondary protocol-requests') do
-        content_tag :span, class: 'd-flex align-items-center' do
-          raw(Protocol.human_attribute_name(:requests) + content_tag(:span, protocol.sub_service_requests.count, class: 'badge badge-pill badge-c badge-light ml-2'))
-        end
-      end
-    end
+    expect(@document.reload.doc_type).to eq('consent')
   end
 end

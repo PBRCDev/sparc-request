@@ -20,36 +20,23 @@
 
 require 'rails_helper'
 
-RSpec.describe 'User creates an arm', js: true do
+RSpec.feature 'User wants to delete a document', js: true do
   let_there_be_lane
-
   fake_login_for_each_test
 
   before :each do
-    institution = create(:institution, name: "Institution")
-    provider    = create(:provider, name: "Provider", parent: institution)
-    program     = create(:program, name: "Program", parent: provider, process_ssrs: true)
-    service     = create(:service, name: "Service", abbreviation: "Service", organization: program)
-    @protocol   = create(:protocol_federally_funded, type: 'Study', primary_pi: jug2, start_date: nil, end_date: nil)
-    @sr         = create(:service_request_without_validations, status: 'first_draft', protocol: @protocol)
-    ssr         = create(:sub_service_request_without_validations, service_request: @sr, organization: program, status: 'first_draft')
-                  create(:line_item, service_request: @sr, sub_service_request: ssr, service: service)
+    @protocol = create(:study_federally_funded, primary_pi: jug2)
+    @document = create(:document, protocol: @protocol, doc_type: 'budget')
+
+    visit dashboard_protocol_path(@protocol)
+    wait_for_javascript_to_finish
   end
 
-  context 'and clicks the \'Add Arm\', fills out the form, and submits' do
-    scenario 'and sees the created arm' do
-      visit service_details_service_request_path(srid: @sr.id)
-      wait_for_javascript_to_finish
-      click_button 'Add Arm'
-      wait_for_javascript_to_finish
+  it 'should delete the document' do
+    find('.delete-document').click
+    confirm_swal
+    wait_for_javascript_to_finish
 
-      fill_in 'arm_name', with: 'Armania'
-
-      click_button 'Add'
-      wait_for_javascript_to_finish
-
-      # Screening date + new arm
-      expect(@protocol.arms.count).to eq(2)
-    end
+    expect(@protocol.reload.documents.count).to eq(0)
   end
 end

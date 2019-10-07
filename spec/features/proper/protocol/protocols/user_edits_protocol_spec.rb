@@ -20,36 +20,36 @@
 
 require 'rails_helper'
 
-RSpec.describe 'User wants to delete an authorized user', js: true do
+RSpec.describe 'User edits protocol', js: true do
   let_there_be_lane
-  let_there_be_j
-
   fake_login_for_each_test
+  build_study_type_question_groups
+  build_study_type_questions
 
   before :each do
-    institution = create(:institution, name: "Institution")
-    provider    = create(:provider, name: "Provider", parent: institution)
-    program     = create(:program, name: "Program", parent: provider, process_ssrs: true, pricing_setup_count: 1)
-    service     = create(:service, name: "Service", abbreviation: "Service", organization: program, pricing_map_count: 1)
-    @protocol   = create(:protocol_federally_funded, type: 'Study', primary_pi: jug2)
-    @sr         = create(:service_request_without_validations, status: 'first_draft', protocol: @protocol)
-    ssr         = create(:sub_service_request_without_validations, service_request: @sr, organization: program, status: 'first_draft')
-                  create(:line_item, service_request: @sr, sub_service_request: ssr, service: service)
-    @auth_u     = create(:project_role, identity: jpl6, protocol: @protocol, role: 'technician')
+    org       = create(:organization, name: "Program", process_ssrs: true, pricing_setup_count: 1)
+    service   = create(:service, name: "Service", abbreviation: "Service", organization: org, pricing_map_count: 1)
+    @protocol = create(:study_federally_funded, primary_pi: jug2)
+    @sr       = create(:service_request_without_validations, status: 'draft', protocol: @protocol)
+    ssr       = create(:sub_service_request_without_validations, service_request: @sr, organization: org, status: 'draft')
+                create(:line_item, service_request: @sr, sub_service_request: ssr, service: service)
+
+    visit protocol_service_request_path(srid: @sr.id)
+    wait_for_javascript_to_finish
+    click_link I18n.t('protocols.edit', protocol_type: @protocol.model_name.human)
+    wait_for_javascript_to_finish
   end
 
-  context 'and clicks the delete button' do
-    scenario 'and sees the user deleted' do
-      visit protocol_service_request_path(srid: @sr.id)
-      wait_for_javascript_to_finish
 
-      all('.delete-associated-user-button').last.click
-      wait_for_javascript_to_finish
+  it 'should update the Protocol' do
+    fill_in 'protocol_short_title', with: 'Fresh Prince of Bel-Air'
+    fill_in 'protocol_title', with: 'Now this is a short title all about how my life got flipped-turned upside down'
 
-      find('.sweet-alert.visible button.confirm').click
-      wait_for_javascript_to_finish
+    click_button I18n.t('actions.save')
+    wait_for_javascript_to_finish
 
-      expect(ProjectRole.count).to eq(1)
-    end
+    expect(page).to have_current_path(protocol_service_request_path(srid: @sr.id))
+    expect(@protocol.reload.short_title).to eq('Fresh Prince of Bel-Air')
+    expect(@protocol.reload.title).to eq('Now this is a short title all about how my life got flipped-turned upside down')
   end
 end

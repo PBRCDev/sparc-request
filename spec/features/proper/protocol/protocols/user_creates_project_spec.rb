@@ -18,50 +18,39 @@
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-module Dashboard::ProtocolsHelper
-  def break_before_parenthetical(s)
-    i = s.index('(')
-    if i.present?
-      beginning = s[0...i]
-      ending = s[i..-1]
-      raw(beginning +'<br>'+ ending)
-    else
-      s
-    end
+require 'rails_helper'
+
+RSpec.describe 'User creates project', js: true do
+  let_there_be_lane
+  fake_login_for_each_test
+
+  stub_config("use_epic", true)
+
+  before :each do
+    org     = create(:organization, name: "Program", process_ssrs: true, pricing_setup_count: 1)
+    service = create(:service, name: "Service", abbreviation: "Service", organization: org, pricing_map_count: 1)
+    @sr     = create(:service_request_without_validations, status: 'first_draft')
+    ssr     = create(:sub_service_request_without_validations, service_request: @sr, organization: org, status: 'first_draft')
+              create(:line_item, service_request: @sr, sub_service_request: ssr, service: service)
+
+    visit protocol_service_request_path(srid: @sr.id)
+    wait_for_javascript_to_finish
+    click_link I18n.t('protocols.form.header.new', protocol_type: Project.model_name.human)
+    wait_for_javascript_to_finish
   end
 
-  def protocol_id_link(protocol)
-    link_to protocol.id, dashboard_protocol_path(protocol)
-  end
+  it 'should create a new project' do
+    fill_in 'protocol_short_title', with: 'asd'
+    fill_in 'protocol_title', with: 'asd'
+    bootstrap_typeahead '#primary_pi', 'Julia'
+    bootstrap_select '#protocol_funding_status', 'Funded'
+    bootstrap_select '#protocol_funding_source', 'Federal'
 
-  def protocol_short_title_link(protocol)
-    link_to protocol.short_title, dashboard_protocol_path(protocol)
-  end
+    click_button I18n.t('actions.save')
+    wait_for_javascript_to_finish
 
-  def pis_display(protocol)
-    if protocol.primary_pi
-      content_tag(:div, title: Protocol.human_attribute_name(:primary_pi), data: { toggle: 'tooltip', boundary: 'window' }) do
-        content_tag(:span) do
-          icon('fas', 'user-circle mr-2') + protocol.primary_pi.display_name
-        end + '<br>'.html_safe
-      end
-    else
-      ""
-    end + raw(
-    protocol.principal_investigators.where.not(id: protocol.primary_pi).map do |pi|
-      content_tag(:span) do
-        icon('fas', 'user mr-2') + pi.display_name
-      end
-    end.join('<br>'.html_safe))
-  end
-
-  def display_requests_button(protocol, access)
-    if protocol.sub_service_requests.any? && access
-      link_to(display_requests_dashboard_protocol_path(protocol), remote: true, class: 'btn btn-secondary protocol-requests') do
-        content_tag :span, class: 'd-flex align-items-center' do
-          raw(Protocol.human_attribute_name(:requests) + content_tag(:span, protocol.sub_service_requests.count, class: 'badge badge-pill badge-c badge-light ml-2'))
-        end
-      end
-    end
+    expect(Project.count).to eq(1)
+    expect(@sr.reload.protocol.becomes(Project)).to eq(Project.last)
+    expect(page).to have_current_path(protocol_service_request_path(srid: @sr.id))
   end
 end

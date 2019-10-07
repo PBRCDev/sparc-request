@@ -20,38 +20,30 @@
 
 require 'rails_helper'
 
-RSpec.describe 'User sets timeline dates', js: true do
+RSpec.describe 'User wants to make a new Project', js: true do
   let_there_be_lane
-
   fake_login_for_each_test
 
+  stub_config("use_epic", true)
+
   before :each do
-    institution = create(:institution, name: "Institution")
-    provider    = create(:provider, name: "Provider", parent: institution)
-    program     = create(:program, name: "Program", parent: provider, process_ssrs: true)
-    service     = create(:service, name: "Service", abbreviation: "Service", organization: program, pricing_map_count: 1)
-    @protocol   = create(:protocol_federally_funded, type: 'Study', primary_pi: jug2, start_date: nil, end_date: nil)
-    @sr         = create(:service_request_without_validations, status: 'first_draft', protocol: @protocol)
-    ssr         = create(:sub_service_request_without_validations, service_request: @sr, organization: program, status: 'first_draft')
-                  create(:line_item, service_request: @sr, sub_service_request: ssr, service: service)
-                  create(:pricing_setup, organization: program)
+    visit dashboard_root_path
+    wait_for_javascript_to_finish
+    click_button I18n.t('dashboard.protocols.new')
+    click_link I18n.t('protocols.new', protocol_type: Project.model_name.human)
   end
 
-  context 'and submits the form' do
-    scenario 'and sees the dates applied to the protocol' do
-      visit service_details_service_request_path(srid: @sr.id)
-      wait_for_javascript_to_finish
+  it 'should create a new Project' do
+    fill_in 'protocol_short_title', with: 'asd'
+    fill_in 'protocol_title', with: 'asd'
+    bootstrap_typeahead '#primary_pi', 'Julia'
+    bootstrap_select '#protocol_funding_status', 'Funded'
+    bootstrap_select '#protocol_funding_source', 'Federal'
 
-      bootstrap_datepicker '#study_start_date', '01/02/2016'
-      first('.page-header').click
-      bootstrap_datepicker '#study_end_date', '03/04/2016'
-      first('.page-header').click
+    click_button I18n.t('actions.save')
+    wait_for_javascript_to_finish
 
-      click_link 'Save and Continue →'
-      wait_for_javascript_to_finish
-
-      expect(@protocol.reload.start_date.to_date).to eq('2/1/2016'.to_date)
-      expect(@protocol.reload.end_date.to_date).to eq('4/3/2016'.to_date)
-    end
+    expect(Project.count).to eq(1)
+    expect(page).to have_current_path(dashboard_protocol_path(Protocol.last))
   end
 end

@@ -31,28 +31,32 @@ class Funding::ServicesController < ApplicationController
   end
 
   def index
-    respond_to do |format|
-      format.html
-      format.json{
-        @services = Service.funding_opportunities
-        current_user = current_user
-      }
-    end
+    @services = Service.funding_opportunities
+    respond_to :json, :html
   end
 
   def show
     @service = Service.find(params[:id])
+    cookies["table-type-#{@service.id}"] ||= 'loi'
   end
 
   def documents
     @table = params[:table]
     @service_id = params[:id]
+<<<<<<< HEAD
+=======
+    cookies["table-type-#{@service_id}"] = @table
+>>>>>>> v3.6.0
     @funding_documents = Document.joins(sub_service_requests: {line_items: :service}).where(services: {id: @service_id}, doc_type: @table).distinct
 
     respond_to do |format|
       format.json
       format.csv{
+<<<<<<< HEAD
         send_data to_csv(@funding_documents), filename: "#{@table.upcase}_List.csv"
+=======
+        send_data to_csv(@funding_documents), filename: "#{@table.upcase}.csv"
+>>>>>>> v3.6.0
       }
     end
   end
@@ -65,12 +69,19 @@ class Funding::ServicesController < ApplicationController
     end
   end
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> v3.6.0
   def to_csv(documents)
     CSV.generate do |csv|
       ##Insert headers
       csv << ["SRID", "Primary PI", "Institution", "Protocol Short Title", "Document Name", "Uploaded", "SSR Status"]
+<<<<<<< HEAD
       ##Insert data for each protocol
+=======
+      ##Insert table row for each document
+>>>>>>> v3.6.0
       documents.each do |d|
         ssr = d.sub_service_requests.where(organization_id: Setting.get_value("funding_org_ids")).first
         p = ssr.protocol
@@ -78,5 +89,8 @@ class Funding::ServicesController < ApplicationController
       end
     end
   end
+<<<<<<< HEAD
 
+=======
+>>>>>>> v3.6.0
 end

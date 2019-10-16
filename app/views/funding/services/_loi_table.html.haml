@@ -18,23 +18,23 @@
 -# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR~
 -# TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.~
 
-.card#fundingsList
-  .card-header.bg-primary.text-white
-    %h3.mb-0
-      = t('funding.index.header')
-<<<<<<< HEAD
-=======
-
->>>>>>> v3.6.0
-  #fundingsTableToolbar
-  %table#fundings_table{ data: { toggle: 'table', url: funding_services_path(format: :json), search: 'true', pagination: 'true', page_size: '20', sort_name: 'created', sort_order: 'desc', toolbar: '#fundingsTableToolbar' } }
-    %thead.bg-light
-      %tr
-        %th{ data: { class: 'title', field: "title", align: "left", sortable: 'true' } }
-          = t(:funding)[:index][:table][:headers][:title]
-        %th{ class: 'program', data: { field: "program", align: "left", sortable: 'true' } }
-          = t(:funding)[:index][:table][:headers][:program]
-        %th{ class: 'created', data: { field: "created", align: "left", sortable: 'true' , sorter: "dateSorter"  } }
-          = t(:funding)[:index][:table][:headers][:created]
-        %th{ class: 'action', data: { field: "action", align: "center" } }
-          = t(:funding)[:index][:table][:headers][:action]
+#loiTableToolbar
+%table.table-no-bordered#loi-table{ data: {pagination: 'true', 'page-size' => 25, 'show-columns' => 'true', 'show-refresh' => 'true', 'show-export' => 'true', toggle: 'table', search: "true", url: documents_funding_service_path(id: @service.id, table: 'loi', format: :json ), 'sort-name' => 'srid', 'sort-order' => 'asc', toolbar: "#loiTableToolbar"}}
+  %thead.bg-light
+    %tr
+      %th{data: {class: 'srid', align: "left", sortable: "true", field: "srid"}}
+        = t(:funding)[:download][:table][:srid]
+      %th{data: {class: 'pi', align: "left", sortable: "true", field: "pi"}}
+        = t(:funding)[:download][:table][:pi]
+      %th{data: {class: 'institution', align: "left", sortable: "true", field: "institution"}}
+        = t(:funding)[:download][:table][:institution]
+      %th{data: {class: 'short_title', align: "left", sortable: "false", field: "short_title"}}
+        = t(:funding)[:download][:table][:short_title]
+      %th{data: {class: 'doc_title', align: "left", sortable: "false", field: "doc_title"}}
+        = t(:funding)[:download][:table][:doc_title]
+      %th{data: {class: 'uploaded', align: "left", sortable: "true", field: "uploaded", sorter: "dateSorter"}}
+        = t(:funding)[:download][:table][:uploaded]
+      %th{data: {class: 'status', align: "left", sortable: "true", field: "status"}}
+        = t(:funding)[:download][:table][:status]
+      %th{data: {class: 'actions', align: "center", sortable: "false", field: "actions"}}
+        = t(:funding)[:download][:table][:actions][:label]

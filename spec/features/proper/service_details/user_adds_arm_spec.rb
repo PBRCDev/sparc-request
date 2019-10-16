@@ -19,49 +19,36 @@
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'rails_helper'
-require 'timecop'
 
-RSpec.describe 'User takes a survey', js: true do
+RSpec.describe 'User adds an arm to a request', js: true do
   let_there_be_lane
-
   fake_login_for_each_test
 
   before :each do
-    @survey   = create(:system_survey, :with_question, title: "My Survey", active: true)
-    @section  = create(:section, survey: @survey)
     org       = create(:organization)
-    @ssr      = create(:sub_service_request_without_validations, organization: org)
-    @response = create(:response, survey: @survey, identity: jug2, respondable_type: 'SubServiceRequest', respondable_id: @ssr.id)
+    pricing   = create(:pricing_setup, organization: org)
+    pppv      = create(:service, organization: org, one_time_fee: false, pricing_map_count: 1)
+
+    @protocol = create(:protocol_federally_funded, primary_pi: jug2)
+    sr        = create(:service_request_without_validations, protocol: @protocol)
+    ssr       = create(:sub_service_request, service_request: sr, organization: org)
+    @pppv_li  = create(:line_item, service_request: sr, sub_service_request: ssr, service: pppv)
+                create(:arm, protocol: @protocol, subject_count: 10)
+
+    visit service_details_service_request_path(srid: sr.id)
+    wait_for_javascript_to_finish
   end
 
-  context 'and selects an option with a dependent question' do
-    scenario 'and sees the dependent question' do
-      @q_radio_button = create(:question, section: @section, question_type: 'radio_button', content: 'Radio Button Question')
-      @opt1           = create(:option, question: @q_radio_button, content: "Option 1")
-      @opt2           = create(:option, question: @q_radio_button, content: "Option 2")
-      @q_dependent    = create(:question, section: @section, content: 'Dependent Question', depender: @opt1)
+  it 'should create the new arm' do
+    click_link I18n.t('arms.new')
+    wait_for_javascript_to_finish
 
-      visit edit_surveyor_response_path(@response)
-      wait_for_javascript_to_finish
+    fill_in 'arm_name', with: 'Give me an Arm'
 
-      first('input').click
-      wait_for_javascript_to_finish
+    click_button I18n.t('actions.submit')
+    wait_for_javascript_to_finish
 
-      expect(page).to have_content('Dependent Question')
-    end
-  end
-
-  context 'and fills out the survey and submits' do
-    scenario 'and is redirected to the completed screen' do
-      visit edit_surveyor_response_path(@response)
-      wait_for_javascript_to_finish
-
-      click_button 'Submit'
-
-      complete_page = surveyor_response_complete_path(Response.last)
-      wait_for_page(complete_page)
-
-      expect(current_path).to eq(complete_page)
-    end
+    expect(@protocol.reload.arms.count).to eq(2)
+    expect(page).to have_selector('.service-calendar-container .card-header h3', text: 'Give me an Arm')
   end
 end

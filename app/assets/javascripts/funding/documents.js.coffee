@@ -19,6 +19,7 @@
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.~
 
 $(document).ready ->
+<<<<<<< HEAD
   $('#documentsList .export button').addClass('no-caret').siblings('.dropdown-menu').addClass('d-none')
 
   $(document).on 'click', '#documentsList .export button', ->
@@ -38,3 +39,19 @@ $(document).ready ->
     $(this).removeClass('btn-light').addClass('btn-primary').find('.fa-sync').removeClass('d-none')
     $('#documents_tabs').data('selected', 'loi')
     $('#documents-table').bootstrapTable 'refresh', { query: { table: 'loi' } }
+=======
+  $('#docTabs .export button').addClass('no-caret').siblings('.dropdown-menu').addClass('d-none')
+
+  $(document).on 'click', '#loi .export button', ->
+    url = new URL($('#loi-table').data('url'), window.location.origin)
+    url.pathname = url.pathname.replace('json', 'csv')
+    window.location = url
+
+  $(document).on 'click', '#application .export button', ->
+    url = new URL($('#app-table').data('url'), window.location.origin)
+    url.pathname = url.pathname.replace('json', 'csv')
+    window.location = url
+
+  $(document).on 'show.bs.tab', '#docTabs [data-toggle=tab]', (event) ->
+    $("#{this.hash}").find('table[data-toggle=table]').bootstrapTable('refresh')
+>>>>>>> v3.6.0

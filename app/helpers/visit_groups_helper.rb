@@ -54,7 +54,7 @@ module VisitGroupsHelper
         max =
           if vg_at_position != visit_group && vg_at_position.day && vg_at_position.day == min
             vg_at_position.day
-          elsif vg_at_position.day && (min.nil? || vg_at_position.day > min)
+          elsif vg_at_position != visit_group && vg_at_position.day && (min.nil? || vg_at_position.day > min)
             vg_at_position.day.try(:-, 1)
           elsif (day = vg_at_position.lower_items.where.not(id: visit_group.id, day: nil).minimum(:day)) == min
             day
@@ -62,7 +62,7 @@ module VisitGroupsHelper
             day.try(:-, 1)
           end
       else
-        min = arm.visit_groups.maximum(:day) + 1
+        min = arm.visit_groups.maximum(:day).try(:+, 1)
         max = nil
       end
 

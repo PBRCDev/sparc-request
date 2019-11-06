@@ -19,27 +19,6 @@
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.~
 
 $(document).ready ->
-<<<<<<< HEAD
-  $('#documentsList .export button').addClass('no-caret').siblings('.dropdown-menu').addClass('d-none')
-
-  $(document).on 'click', '#documentsList .export button', ->
-    table = $('#documents_tabs').data('selected')
-    url = new URL($('#documents-table').data('url').split('?')[0] + "?table=#{table}", window.location.origin)
-    url.pathname = url.pathname.replace('json', 'csv')
-    window.location = url
-
-  $(document).on 'click', '#application',  ->
-    $('.document_nav').removeClass('btn-primary').addClass('btn-light').find('.fa-sync').addClass('d-none')
-    $(this).removeClass('btn-light').addClass('btn-primary').find('.fa-sync').removeClass('d-none')
-    $('#documents_tabs').data('selected', 'application')
-    $('#documents-table').bootstrapTable 'refresh', { query: { table: 'application' } }
-
-  $(document).on 'click', '#loi',  ->
-    $('.document_nav').removeClass('btn-primary').addClass('btn-light').find('.fa-sync').addClass('d-none')
-    $(this).removeClass('btn-light').addClass('btn-primary').find('.fa-sync').removeClass('d-none')
-    $('#documents_tabs').data('selected', 'loi')
-    $('#documents-table').bootstrapTable 'refresh', { query: { table: 'loi' } }
-=======
   $('#docTabs .export button').addClass('no-caret').siblings('.dropdown-menu').addClass('d-none')
 
   $(document).on 'click', '#loi .export button', ->
@@ -54,4 +33,3 @@ $(document).ready ->
 
   $(document).on 'show.bs.tab', '#docTabs [data-toggle=tab]', (event) ->
     $("#{this.hash}").find('table[data-toggle=table]').bootstrapTable('refresh')
->>>>>>> v3.6.0

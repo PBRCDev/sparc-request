@@ -172,12 +172,6 @@ class Arm < ApplicationRecord
     self.update_attributes(:minimum_visit_count => self.visit_count, :minimum_subject_count => self.subject_count)
   end
 
-  def default_visit_days
-    self.visit_groups.each do |vg|
-      vg.update_attributes(day: vg.position * VisitGroup.admin_day_multiplier)
-    end
-  end
-
   ### audit reporting methods ###
 
   def audit_label audit
@@ -213,12 +207,11 @@ class Arm < ApplicationRecord
   end
 
   def mass_create_visit_groups
-    last_position = self.visit_groups.any? ? self.visit_groups.last.position : 0
-    position      = last_position + 1
-    count         = self.visit_count - last_position
+    position = self.visit_groups.any? ? self.visit_groups.last.position : 0
+    count    = self.visit_count - position
 
     count.times do |index|
-      self.visit_groups.new(name: "Visit #{position}", position: position).save(validate: false)
+      self.visit_groups.new(name: "Visit #{position + 1}", position: position).save(validate: false)
       position += 1
     end
   end

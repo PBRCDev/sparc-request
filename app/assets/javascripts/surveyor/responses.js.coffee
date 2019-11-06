@@ -23,7 +23,7 @@ $(document).ready ->
 
   $(document).on 'click', '#responsesList .export button', ->
     url = new URL($('#responsesTable').data('url'), window.location.origin)
-    url.pathname = url.pathname.replace('json', 'csv')
+    url.pathname = url.pathname.replace('json', 'xlsx')
     window.location = url
 
 
@@ -31,11 +31,12 @@ $(document).ready ->
     $(this).find('input').prop('checked', true)
 
   $(document).on 'change', '.option input', ->
-    if ($(this).prop('type') == 'checkbox' && $(this).prop('id').endsWith('for_dependent')) || $(this).prop('type') == 'radio'
+    if $(this).prop('type') == 'checkbox' || $(this).prop('type') == 'radio'
       question_id = $(this).parents('.option').data('question-id')
       option_id = $(this).parents('.option').data('option-id')
 
-      $(".dependent-for-question-#{question_id}").addClass('d-none')
+      if $(this).prop('type') == 'radio'
+        $(".dependent-for-question-#{question_id}").addClass('d-none')
 
       if $(this).is(":checked")
         $(".dependent-for-option-#{option_id}").removeClass('d-none')
@@ -103,14 +104,6 @@ $(document).ready ->
     else
       $('.survey-select option').prop('disabled', false)
       $('.survey-select').selectpicker('refresh')
-
-  $('#responses-panel .export button').removeClass('dropdown-toggle').removeAttr('data-toggle')
-  $('#responses-panel .export button .caret').remove()
-  $('#responses-panel .export .dropdown-menu').remove()
-
-  $(document).on 'click', '#responses-panel .export button', ->
-    $(this).parent().removeClass('open')
-    window.location = '/surveyor/responses.xlsx'
 
   if $('#responseStartDatePicker').length && $('#responseEndDatePicker').length
     startDate = $('#responseStartDatePicker').data().date

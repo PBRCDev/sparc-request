@@ -29,9 +29,8 @@ class VisitGroupsController < ApplicationController
     @tab          = params[:tab]
     @visit_group  =
       if params[:visit_group]
-        # The way position is handled is really annoying. If you mass 
-        # assign position then arm_id is nil making position= set
-        # position to nil as well
+        # If you mass assign position then arm_id is nil
+        # making position= set position to nil as well
         vg = @arm.visit_groups.new(visit_group_params.except(:position))
         vg.assign_attributes(position: visit_group_params[:position])
         vg
@@ -73,8 +72,6 @@ class VisitGroupsController < ApplicationController
   end
 
   def update
-    # Decrement position because it will be incremented by the model
-    params[:visit_group][:position] = params[:visit_group][:position].to_i - 1
     @arm = @visit_group.arm
     @tab = params[:tab]
 

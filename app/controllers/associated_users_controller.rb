@@ -1,4 +1,3 @@
-# Copyright © 2011-2019 MUSC Foundation for Research Development
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -107,7 +106,10 @@ class AssociatedUsersController < ApplicationController
   private
 
   def project_role_params
-    params[:project_role][:identity_attributes][:phone] = sanitize_phone params[:project_role][:identity_attributes][:phone]
+    if params[:project_role][:identity_attributes]
+      params[:project_role][:identity_attributes][:phone] = sanitize_phone params[:project_role][:identity_attributes][:phone]
+    end
+
     params[:project_role][:project_rights] ||= ""
 
     params.require(:project_role).permit(

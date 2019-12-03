@@ -135,7 +135,7 @@ en:
         quantity: "Qty Requested"
         quantity_type: "Qty Type"
         clinical_quantity_type: "Clinical Qty Type"
-        created_at: "Date Received"
+        created_at: "Date Added"
         in_process_date: "Date Processed"
         complete_date: "Date Completed"
       line_items_visit:
@@ -216,6 +216,7 @@ en:
         owner: "Owner"
         status: "Status"
         forms: "Forms"
+        submitted_at: "Submitted"
       sub_service_request:
         srid: "SRID"
       short_interaction:

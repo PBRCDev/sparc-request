@@ -41,12 +41,14 @@
           = LineItem.human_attribute_name(:quantity)
         %th{ data: { class: 'qty_rem', align: 'left', sortable: 'true', field: 'quantity_type' } }
           = LineItem.human_attribute_name(:quantity_type)
-        %th{ data: { class: 'service-rate', align: 'left', sortable: 'true', field: 'service_rate' } }
+        %th{ data: { class: 'service-rate', align: 'left', sortable: 'true', field: 'service_rate', visible: 'false' } }
           = LineItem.human_attribute_name(:service_rate)
-        %th{ data: { class: 'cost', align: 'left', sortable: 'true', field: 'cost' } }
+        %th{ data: { class: 'cost', align: 'left', sortable: 'true', field: 'cost', visible: 'false' } }
           = LineItem.human_attribute_name(:displayed_cost)
         %th{ data: { class: 'total', align: 'left', sortable: 'true', field: 'total', visible: 'false' } }
           = t('calendars.otf.header_fields.total_per_study').gsub('<br>', '')
+        %th{ data: { class: 'date-started', align: 'left', sortable: 'true', field: 'created_at', sorter: 'dateSorter' } }
+          = LineItem.human_attribute_name(:created_at)
         %th{ data: { class: 'date-started', align: 'left', sortable: 'true', field: 'date_started', sorter: 'dateSorter' } }
           = LineItem.human_attribute_name(:in_process_date)
         %th{ data: { class: 'date-completed', align: 'left', sortable: 'true', field: 'date_completed', sorter: 'dateSorter' } }

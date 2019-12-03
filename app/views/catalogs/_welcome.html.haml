@@ -30,9 +30,12 @@
       = raw t('proper.catalog.center.text')
     .w-100.mb-3
       = link_to t('proper.catalog.center.dashboard_link'), dashboard_root_path, class: 'btn btn-lg btn-outline-primary'
-    %p.mb-0
-      %strong
-        = t('proper.catalog.center.notice')
+    %h5.mb-0
+      = t('proper.catalog.center.notice')
 
 - if Setting.get_value('use_tableau') && Setting.get_value('homepage_tableau_url')
   = render 'catalogs/tableau'
+- else
+  .text-left
+    %p.mt-3.border-top
+      = t('proper.catalog.center.disclaimer')

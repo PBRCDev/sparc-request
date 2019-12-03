@@ -64,4 +64,17 @@ module Dashboard::ProtocolsHelper
       end
     end
   end
+
+  #### lacats: shown on protocls list and SSR header, respectively ####
+  def display_primary_pi_short(protocol)
+    protocol.try(:primary_principal_investigator).try(:name_institution_shortname)
+  end
+
+  def display_primary_pi(protocol)
+    if protocol.primary_principal_investigator
+      protocol.primary_principal_investigator.display_name_email_institution
+    else
+      ''
+    end
+  end
 end

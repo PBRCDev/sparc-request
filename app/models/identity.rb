@@ -102,7 +102,7 @@ class Identity < ApplicationRecord
 
  # Returns this user's first and last name humanized, with their email.
   def display_name
-    "#{first_name.try(:humanize)} #{last_name.try(:humanize)} (#{email})".lstrip.rstrip
+    "#{first_name} #{last_name} (#{email})".lstrip.rstrip
   end
 
   # Return the netid (ldap_uid without the @musc.edu)
@@ -118,6 +118,79 @@ class Identity < ApplicationRecord
   def professional_org_lookup(org_type)
     professional_organization ? professional_organization.parents_and_self.select{|org| org.org_type == org_type}.first.try(:name) : ""
   end
+
+  ####### Lacats: DNS #######
+
+  def full_name_last_first
+    "#{last_name}, #{first_name}".lstrip.rstrip
+  end
+
+  def display_credential_value
+    if credentials == "other"
+      return credentials_other
+    else
+      "#{PermissibleValue.get_value('user_credential', credentials)}"
+    end
+  end
+
+  def display_ro1_awardee
+    if ro1_awardee.nil?
+      return ""
+    else
+      return "N" unless ro1_awardee; return "Y"
+    end
+  end
+###[v3.0.0b permissible values]
+  def display_academic_rank
+    academic_rank.nil? ? "" : "#{PermissibleValue.get_value('academic_rank', academic_rank)}"
+  end
+
+  def display_ethnicity
+    ethnicity.nil? ? "" : "#{PermissibleValue.get_value('ethnicity', ethnicity)}"
+  end
+
+  def display_gender
+    gender.nil? ? "" : "#{PermissibleValue.get_value('gender', gender)}"
+  end
+
+  def display_age_group
+    age_group.nil? ? "" : "#{PermissibleValue.get_value('age_group', age_group)}"
+  end
+
+  ## [1.9.0, revised 1.9.5] professional_organization changes, yw
+  def institution_professional_organization
+    self.professional_org_lookup('institution')
+  end
+
+  # full name (email) - institution: shown in dashboard study_summary
+  def display_name_email_institution
+    "#{display_name} - #{institution_professional_organization}"
+  end
+
+  def name_institution_shortname
+    "#{full_name} (" + institution_shortname + ")"
+  end
+
+  def institution_shortname
+    case institution_professional_organization
+    when 'Pennington Biomedical Research Center' then 'PBRC'
+    when 'Tulane University' then 'Tulane'
+    when 'LSU Health Sciences Center New Orleans' then 'LSUHSC-NO'
+    when 'LSU Health Sciences Center Shreveport' then 'LSUHCS-S'
+    when 'Xavier University of Louisiana' then 'Xavier'
+    when 'Children’s Hospital New Orleans' then "CHNOLA"
+    when 'LSU A&M' then 'LSU A&M'
+    when 'Medical University of South Carolina' then 'MUSC'
+    when 'Ochsner Health System' then 'Ochsner'
+    when 'Southeast Louisiana Veterans Health Care System' then 'SLVHCS'
+    when 'University Medical Center New Orleans' then 'UMC'
+    when 'Other' then 'Other'
+    else ''
+    end
+  end
+
+  ######### END OF LA CaTS helper methods #######################
+
 
   ###############################################################################
   ############################ ATTRIBUTE METHODS ################################
@@ -379,4 +452,41 @@ class Identity < ApplicationRecord
   def unread_notification_count(sub_service_request_id=nil)
     Notification.of_ssr(sub_service_request_id).unread_by(id).count
   end
+
+  ###############################################################################
+  ########################## LACATS_ROLE METHODS ################################
+  ###############################################################################
+  def populate_for_edit
+    self.setup_lacats_roles
+  end
+
+  def setup_lacats_roles
+    position = 1
+    obj_names = PermissibleValue.get_key_list('lacats_role')
+    obj_names.each do |obj_name|
+      lacats_role = lacats_roles.detect{|obj| obj.name == obj_name}
+      lacats_role = lacats_roles.build(:name => obj_name, :new => true) unless lacats_role
+      lacats_role.position = position
+      position += 1
+    end
+    lacats_roles.sort_by(&:position)
+  end
+
+  def display_lacats_roles
+    list = ""
+    self.lacats_roles.each do |lr|
+      list += list.blank? ? "" : "; "
+      list += PermissibleValue.get_value('lacats_role', lr.name)
+      list += " - #{lr.role.titleize}" if lr.role
+    end
+    return list
+  end
+
+
+  private
+
+  def update_ldap_uid
+     self.ldap_uid = self.email if email_changed?
+  end
+
 end

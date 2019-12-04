@@ -321,6 +321,12 @@ class SubServiceRequest < ApplicationRecord
     self.status == 'first_draft' || (process_ssrs_organization.has_editable_status?(self.status) && !self.is_complete?)
   end
 
+### lacats only: for admin edit
+  def locked_admin_edit_status?
+    submitted_at.nil? && !Setting.find_by_key("funding_org_ids").value.include?(organization.id)
+  end
+
+### lacats Note[v3.2.0]: is_complete? if the ssr status is one of finished_statuses- shopping cart and Admin Edit status dropdown
   def is_complete?
     Status.complete?(self.status) && process_ssrs_organization.has_editable_status?(self.status)
   end

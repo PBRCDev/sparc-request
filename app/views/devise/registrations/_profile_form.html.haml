@@ -46,15 +46,6 @@
       %span.form-text.text-muted
         = t('constants.phone.note')
   .form-row
-    .form-group.col-12.col-xl-6
-      = f.label :orcid, class: 'col-form-label'
-      = f.text_field :orcid, class: 'form-control', placeholder: t(:devise)[:profile][:placeholders][:orcid], maxlength: 19
-      %small.form-text
-        = link_to t(:devise)[:profile][:links][:orcid], t(:devise)[:profile][:links][:orcid], target: :_blank
-    .form-group.col-12.col-xl-6
-      = f.label :era_commons_name, t(:devise)[:profile][:era_commons_name], class: 'col-form-label'
-      = f.text_field :era_commons_name, class: 'form-control'
-  .form-row
     .form-group.col-4
       = f.label :credentials, t(:devise)[:profile][:credentials], class: 'col-form-label'
       = f.select :credentials, options_for_select(PermissibleValue.get_inverted_hash('user_credential'), identity.credentials), { include_blank: t(:devise)[:profile][:credentials_prompt] }, class: 'selectpicker'
@@ -62,9 +53,8 @@
       = f.label :credentials_other, t('constants.prompts.please_specify'), class: 'col-form-label'
       = f.text_field :credentials_other, class: 'form-control'
     .form-group.col-4
-      = f.label :subspecialty, t(:devise)[:profile][:subspecialty], class: 'col-form-label'
-      = f.select :subspecialty, options_for_select(PermissibleValue.get_inverted_hash('subspecialty'), identity.subspecialty), { include_blank: t(:devise)[:profile][:subspecialty_prompt] }, class: 'selectpicker'
-
+      = f.label :era_commons_name, t(:devise)[:profile][:era_commons_name], class: 'col-form-label'
+      = f.text_field :era_commons_name, class: 'form-control'
 
   = render "associated_users/professional_organizations", professional_organization: identity.professional_organization
 

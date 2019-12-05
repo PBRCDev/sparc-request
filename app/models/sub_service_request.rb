@@ -317,16 +317,21 @@ class SubServiceRequest < ApplicationRecord
   end
 
   # Can't edit a request if it's placed in an uneditable status
+  # notes (ywu): any editable but not 'finished' status
   def can_be_edited?
     self.status == 'first_draft' || (process_ssrs_organization.has_editable_status?(self.status) && !self.is_complete?)
   end
 
-### lacats only: for admin edit
-  def locked_admin_edit_status?
-    submitted_at.nil? && !Setting.find_by_key("funding_org_ids").value.include?(organization.id)
+### lacats only: for admin edit status dropdown
+  def is_parent_funding_org?
+    Setting.find_by_key("funding_org_ids").value.include?(organization.id)
   end
 
-### lacats Note[v3.2.0]: is_complete? if the ssr status is one of finished_statuses- shopping cart and Admin Edit status dropdown
+  def status_disabled_in_admin_edit?
+    !previously_submitted? && !is_parent_funding_org?
+  end
+### edits end
+
   def is_complete?
     Status.complete?(self.status) && process_ssrs_organization.has_editable_status?(self.status)
   end
@@ -432,16 +437,23 @@ class SubServiceRequest < ApplicationRecord
   # Distributes all available surveys to primary pi and ssr requester
   def distribute_surveys
     primary_pi = protocol.primary_principal_investigator
-    # send all available surveys at once
-    available_surveys = line_items.map{|li| li.service.available_surveys}.flatten.compact.uniq
-    # do nothing if we don't have any available surveys
-    unless available_surveys.empty?
+    # Lacats only (modify logic): e-mail primary PI and requester if when ssr in process, loi_submitted, app_submitted or (complete && no available surveys).
+    if !available_surveys.empty? && status == 'complete'
       SurveyNotification.service_survey(available_surveys, primary_pi, self).deliver
     # only send survey email to both users if they are unique
       if primary_pi != service_requester
         SurveyNotification.service_survey(available_surveys, service_requester, self).deliver
       end
+    else
+      ##### lacats only ####
+      # ['in_process', 'loi_submitted', 'app_submitted'].include?(status) || available_surveys.blank?
+      Notifier.ssr_status_changed(primary_pi, self).deliver_later
     end
+  end
+
+  # send all available surveys at once
+  def available_surveys
+    self.line_items.map{|li| li.service.available_surveys}.flatten.compact.uniq
   end
 
   def surveys_completed?

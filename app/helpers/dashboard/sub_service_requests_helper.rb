@@ -103,7 +103,8 @@ module Dashboard::SubServiceRequestsHelper
       klass = ''
     end
 
-    content_tag :button, class: ['btn btn-block btn-light dropdown-toggle', klass, ssr.previously_submitted? ? '' : 'disabled'], id: 'requestStatus', role: 'button', data: { toggle: 'dropdown', flip: 'false', boundary: 'window' }, aria: { haspopup: 'true', expanded: 'false' } do
+    ## lacates do not disable dropdown for funding admin
+    content_tag :button, class: ['btn btn-block btn-light dropdown-toggle', klass, ssr.status_disabled_in_admin_edit? ? 'disabled' : ''], id: 'requestStatus', role: 'button', data: { toggle: 'dropdown', flip: 'false', boundary: 'window' }, aria: { haspopup: 'true', expanded: 'false' } do
       if ssr.is_complete?
         icon('fas', 'check mr-2')
       elsif ssr.is_locked?
@@ -118,7 +119,8 @@ module Dashboard::SubServiceRequestsHelper
     available_statuses = ssr.organization.available_statuses.selected.pluck(:status)
 
     statuses = 
-      if ssr.is_complete?
+      ## lacats we allow funding admin to update status even if it's completed
+      if ssr.is_complete? && !ssr.is_parent_funding_org?
         PermissibleValue.get_inverted_hash('status').sort.select{ |_, status| Status.complete?(status) }
       else
         PermissibleValue.get_inverted_hash('status').sort

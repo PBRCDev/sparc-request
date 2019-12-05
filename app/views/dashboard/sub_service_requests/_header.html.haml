@@ -24,7 +24,7 @@
 
 .card.mb-5#subServiceRequestSummary
   .card-header.justify-content-between.bg-primary.text-white
-    %h3.mb-0<
+    %h4.mb-0<
       = "#{sub_service_request.protocol.short_title} > #{sub_service_request.organization.name} (#{sub_service_request.display_id})"
       %br
       = "Primary PI: #{display_primary_pi(sub_service_request.protocol)}"
@@ -51,7 +51,7 @@
             - unless request_valid
               = icon('fas', 'exclamation-circle text-warning mr-1')
             = t('dashboard.sub_service_requests.header.fulfillment.header')
-        - if sub_service_request.is_complete?
+        - if sub_service_request.is_complete? && !sub_service_request.available_surveys.empty?
           %th.text-center
             = t('dashboard.sub_service_requests.header.surveys.header')
         %th.text-center
@@ -60,7 +60,7 @@
           = t('dashboard.sub_service_requests.header.user_cost')
     %tbody
       %tr
-        %td.text-center{ title: sub_service_request.previously_submitted? ? '' : t('dashboard.sub_service_requests.tooltips.not_submitted'), data: { toggle: 'tooltip', container: 'body' } }
+        %td.text-center{ title: !sub_service_request.status_disabled_in_admin_edit? ? '' : t('dashboard.sub_service_requests.tooltips.not_submitted'), data: { toggle: 'tooltip', container: 'body' } }
           .dropdown
             = ssr_status_dropdown_button(sub_service_request)
             .dropdown-menu{ aria: { labelledby: "requestStatus" } }
@@ -90,7 +90,7 @@
         - if use_fulfillment
           %td.text-center#fulfillmentStatusContainer{ title: request_valid ? '' : t('dashboard.sub_service_requests.tooltips.request_invalid'), data: { toggle: 'tooltip' } }
             = ready_for_fulfillment_display(sub_service_request, request_valid)
-        - if sub_service_request.is_complete?
+        - if sub_service_request.is_complete? && !sub_service_request.available_surveys.empty?
           %td.text-center#surveys
             = resend_surveys_ssr_button(sub_service_request)
         %td.text-center#effectiveCost

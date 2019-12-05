@@ -135,7 +135,7 @@ en:
         quantity: "Qty Requested"
         quantity_type: "Qty Type"
         clinical_quantity_type: "Clinical Qty Type"
-        created_at: "Date Added"
+        created_at: "Date Added" ## lacats  
         in_process_date: "Date Processed"
         complete_date: "Date Completed"
       line_items_visit:
@@ -745,7 +745,7 @@ en:
       information:
         header: "General Information"
         rmid:
-          note: "If your Study has a <a href='%{rmid_url}' target='_blank'>%{rmid_field}</a>, please enter it here and associated information will be filled in automatically."
+          note: "If your Study has a <a href='%{rmid_url}' target='blank'>%{rmid_field}</a>, please enter it here and associated information will be filled in automatically."
           error:
             title: "No Records Found"
             text: "Could not find a Research Master record with RMID <strong>%{rmid}</strong>"

@@ -726,8 +726,8 @@ en:
         unarchive: "Click to reveal on all associated Authorized User dashboards"
         rmid_server_down: "The Research Master ID Server is down. You cannot edit the Research Master ID field at this time."
     view_details:
-      button: "%{protocol_type} Details"
-      header: "%{protocol_type} Details: #%{protocol_id}"
+      button: "View Protocol Details"
+      header: "Protocol ID: %{protocol_id}"
     milestones:
       header: "Milestones"
       sub_header: "Used for Protocol metric tracking"
@@ -739,12 +739,13 @@ en:
       updated: "Protocol Type Updated!"
     form:
       header:
-        new: "Start a New %{protocol_type}"
-        edit: "Edit an Existing %{protocol_type}"
+        new: "Start a New Protocol"
+        edit: "Edit an Existing Protocol"
+        create: "New Protocol"
       navigation:
         header:
-          new: "New %{protocol_type}"
-          edit: "Edit %{protocol_type}"
+          new: "New Protocol"
+          edit: "Edit Protocol"
       information:
         header: "General Information"
         rmid:

@@ -77,7 +77,7 @@
                 - @errors[:recruitment_end_date].each do |message|
                   %small.form-text.form-error
                     = message.capitalize
-        - if protocol.industry_funded?
+        - if protocol.industry_funded? && !Setting.get_value("lacats_only")
           .form-row
             .form-group.col-6{ class: show_errors ? 'is-valid' : '' }
               = f.label :initial_budget_sponsor_received_date

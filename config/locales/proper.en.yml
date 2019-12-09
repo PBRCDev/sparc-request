@@ -62,7 +62,7 @@ en:
     ############
     protocol:
       new:
-        text: "Which type of Protocol best suits your request?"
+        text: "Create a Protocol and add all relevant information"
         study_description: "A Research Study with defined aims and outcomes."
         project_description: "Non-study-specific requests or anything that is not a Research Study."
       review_protocol_notice: "Protocol Information"
@@ -128,6 +128,8 @@ en:
         provider: "Provider"
         program_core: "Program/Core"
         contact: "Contact"
+      ##### lacats #####
+      to_protocol: "Go to Protocol"
       push_to_epic:
         message: "Getting status of last push to Epic..."
         failed: "Unable to get status of last push to Epic."

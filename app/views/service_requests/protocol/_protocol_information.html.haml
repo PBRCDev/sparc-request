@@ -31,26 +31,9 @@
       .card-body
         - if @errors && (service_request.previously_submitted? || Rails.application.routes.recognize_path(request.referrer)[:action] == 'protocol')
           = render 'layouts/modal_errors', errors: @errors, messages: @errors.messages[:protocol]
-        %h4.mb-4
-          = t('proper.protocol.new.text')
-        .row
-          .d-flex.flex-column.col-12.col-sm-6.mb-3.mb-sm-0
-            .flex-fill
-              %h3.text-success.pb-2.mb-2.border-bottom
-                = Study.model_name.human
-              %h3
-                %small.text-muted
-                  = t('proper.protocol.new.study_description')
-            = link_to new_protocol_path(type: Study.name, srid: service_request.id), class: 'btn btn-lg btn-success new-study' do
-              - succeed t('protocols.form.header.new', protocol_type: Study.model_name.human) do
-                = icon('fas', 'plus mr-2')
-          .d-flex.flex-column.col-12.col-sm-6
-            .flex-fill
-              %h3.text-primary.pb-2.mb-2.border-bottom
-                = Project.model_name.human
-              %h3
-                %small.text-muted
-                  = t('proper.protocol.new.project_description')
-            = link_to new_protocol_path(type: Project.name, srid: service_request.id), class: 'btn btn-lg btn-primary new-project' do
-              - succeed t('protocols.form.header.new', protocol_type: Project.model_name.human) do
-                = icon('fas', 'plus mr-2')
+        %h5.mb-4
+          = t('proper.protocol.new.text') 
+        .text-center
+          = link_to new_protocol_path(type: Study.name, srid: service_request.id), class: 'btn btn-lg btn-success new-study' do
+            - succeed t('protocols.form.header.create', protocol_type: Study.model_name.human) do
+              = icon('fas', 'plus mr-2')

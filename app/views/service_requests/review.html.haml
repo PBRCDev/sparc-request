@@ -34,3 +34,4 @@
   - if @service_request.has_associated_forms?
     = render "forms/table", service_request: @service_request, review: @review
 = render 'service_requests/navigation/footer'
+= render 'service_requests/modals/mou_modal', service_request: @service_request

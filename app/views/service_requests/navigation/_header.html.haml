@@ -27,7 +27,7 @@
         = @step_sub_header
     - if @service_request.protocol.present?
       %h3.mb-0.ml-auto
-        = "#{@service_request.protocol.model_name.human} ##{@service_request.protocol.id}"
+        = "#{Protocol.model_name.human} ##{@service_request.protocol.id}"
         %br
         %small.text-muted
           = @service_request.protocol.short_title.truncate(30)

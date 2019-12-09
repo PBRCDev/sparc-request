@@ -78,7 +78,7 @@ en:
         warning: "You must log in before starting a new Service Request."
     passwords:
       new:
-        header: "Forgot Your Password?"
+        header: "Change Password Request"
         send_reset: "Send Reset Instructions"
       edit:
         header: "Change Your Password"

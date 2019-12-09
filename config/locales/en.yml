@@ -105,7 +105,7 @@ en:
         era_commons_name: "ERA Commons Name"
         first_name: "First Name"
         last_name: "Last Name"
-        ldap_uid: "Login"
+        ldap_uid: "Email/Username" #lacats edit
         name: "Name"
         orcid: "ORCID"
         phone: "Phone"
@@ -135,7 +135,7 @@ en:
         quantity: "Qty Requested"
         quantity_type: "Qty Type"
         clinical_quantity_type: "Clinical Qty Type"
-        created_at: "Date Added" ## lacats  
+        created_at: "Date Added" ## lacats
         in_process_date: "Date Processed"
         complete_date: "Date Completed"
       line_items_visit:
@@ -527,6 +527,9 @@ en:
     search:
       loading: "Loading..."
       no_results: "No Results"
+    ### lacats added
+    email:
+      note: "Institution email is preferred"
 
   #################
   # CONTACT FORMS #
@@ -623,8 +626,8 @@ en:
       links:
         about: "About"
         sctr:
-          text: "SCTR"
-          url: "http://sctr.musc.edu"
+          text: "LA CaTS"
+          url: "https://www.lacats.org"
         contact: "Contact Us"
         listserv:
           text: "Listserv"

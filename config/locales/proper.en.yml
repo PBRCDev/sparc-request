@@ -113,6 +113,21 @@ en:
       header: "System Satisfaction Survey"
       participate: "Would you like to participate in a brief SPARCRequest satisfaction survey?"
 
+    #################
+    # MOU - LA CaTS #
+    #################
+    mou:
+      title: "Terms and Conditions"
+      header: "The Memorandum of Understanding (MOU) documents an agreement between the Investigator and the LA CaTS Center:"
+      p_1: "Investigators who utilize the LA CaTS Center services are required to acknowledge LA CaTS Center support in each publication, press release, or other document describing results of this project must include an acknowledgment of the NIH support for this work. Use this descriptive statement as part of a submission:"
+      p_2: "Supported in part by U54 GM104940 from the National Institute of General Medical Sciences of the National Institutes of Health which funds the Louisiana Clinical and Translational Science Center. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health."
+      p_3: "Prior to issuing a press release concerning the outcome of this research, subcontractor will notify the Principal Investigator, Dr. John Kirwan, John.Kirwan@pbrc.edu at least three full business day in advance to allow for coordination."
+      agree: "Agreement"
+      agreement: ", I agree to the above Terms & Conditions."
+      yes_select: "Agree"
+      no_select: "Cancel"
+
+
     ################
     # CONFIRMATION #
     ################

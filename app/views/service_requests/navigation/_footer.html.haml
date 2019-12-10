@@ -27,7 +27,9 @@
             = succeed t(:proper)[:confirmation][:download_request] do
               = icon('fas', 'download mr-2')
         .col-3
-          = link_to t(:proper)[:confirmation][:protocol_link], Setting.get_value("dashboard_link") + "/protocols/#{@service_request.protocol_id}", class: 'btn btn-lg btn-success'
+          = link_to Setting.get_value("dashboard_link") + "/protocols/#{@service_request.protocol_id}", class: 'btn btn-lg btn-block btn-success' do
+            = succeed t(:proper)[:confirmation][:to_protocol] do
+              = icon('fas', 'hand-point-right mr-2')
       - else
         .col.text-left
           = link_to @back, class: ['btn btn-lg btn-link d-none d-sm-inline-block px-0', @current_page == 'catalog' ? 'invisible' : ''] do
@@ -42,7 +44,8 @@
             = save_as_draft_button(@service_request)
         .col.text-right
           - if action_name == 'review'
-            = link_to confirmation_service_request_path(srid: @service_request.id), class: 'btn btn-lg btn-outline-success', id: 'submitRequest' do
+            -# lacats: show mou instead
+            = link_to 'javascript:void(0)', class: 'btn btn-lg btn-outline-success', id: 'submitRequest' do
               - succeed icon('fas', 'arrow-right ml-2') do
                 = t('proper.navigation.bottom.submit')
           - else

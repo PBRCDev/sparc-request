@@ -96,3 +96,4 @@
 
 //= require surveyor/responses
 //= require surveyor/surveys
+//= require mou

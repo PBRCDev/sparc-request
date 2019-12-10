@@ -19,16 +19,8 @@
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 $ ->
-  if $('#use_system_satisfaction').val() == 'true'
-    $(document).one 'click', '#getCostEstimate, #submitRequest', (event) ->
-      event.preventDefault()
-      $this = $(this)
-      $this.addClass('disabled')
 
-      $.ajax
-        method: 'get'
-        dataType: 'script'
-        url: '/service_request/system_satisfaction_survey'
-        data:
-          srid: getSRId()
-          forward: $this.prop('href')
+  $(document).on 'click', '#submitRequest', (event) ->
+    event.preventDefault()
+    $('#modalContainer').html($('#mou-modal').html())
+    $('#modalContainer').modal('show')

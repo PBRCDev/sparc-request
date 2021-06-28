@@ -7,8 +7,8 @@ gem 'activerecord-session_store' # Check usage
 gem 'acts_as_list', git: 'https://github.com/swanandp/acts_as_list.git'
 gem 'acts-as-taggable-on', git: 'https://github.com/Fodoj/acts-as-taggable-on.git', branch: 'rails-5.2' # Consider updating to https://github.com/mbleigh/acts-as-taggable-on
 gem 'audited', '~> 5.0'
-gem 'axlsx', git: 'https://github.com/randym/axlsx', branch: 'master'
-gem 'axlsx_rails'
+gem 'caxlsx'
+gem 'caxlsx_rails'
 gem 'babel-transpiler'
 gem 'bluecloth' # Check usage
 gem 'bootsnap', require: false

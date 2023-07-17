@@ -37,24 +37,24 @@ class Admin::SettingsController < Admin::ApplicationController
         format.html
         format.json {
           @settings = Setting.search_query(@search_input)
-          puts "SEARCH PARAMS:"
-          puts @search_input
-          puts "SETTINGS"
-          puts @settings
+          #puts "SEARCH PARAMS:"
+          #puts @search_input
+          #puts "SETTINGS"
+          #puts @settings
           #if @search_input.blank?
             #puts "SEARCH PARAMS BLANK"
             #@settings = Setting.order(:group, :key)
           #else
             #puts "SEARCH PARAMS:"
             #puts @search_input
-            #@settings = Setting.search_query(@search_input)
-            #@settings = @settings.order(group: :desc, key: :asc)
+            #@settings = Setting.search_query(@search_input).order(group: :desc, key: :asc)
+            #@@serrach_reults = @settings
           #end
         }
-        #format.csv {
-          #@export_data = select_export_data
-          #send_data Setting.to_csv(@export_data), filename: "sparcrequest_admin_settings_list.csv"
-        #}
+        format.csv {
+          @export_data = select_export_data
+          send_data Setting.to_csv(@export_data), filename: "sparcrequest_admin_settings_list.csv"
+        }
       end
     end
 
@@ -80,13 +80,13 @@ class Admin::SettingsController < Admin::ApplicationController
       respond_to :js
     end
 
-    #def select_export_data
-      #if defined?(@@search_results) && @@search_results.present?
-        #@@search_results.order(group: :desc, key: :asc)
-      #else
-        #Setting.all.order(group: :desc, key: :asc)
-      #end
-    #end
+    def select_export_data
+      if defined?(@@search_results) && @@search_results.present?
+        @@search_results.order(group: :desc, key: :asc)
+      else
+        Setting.all.order(group: :desc, key: :asc)
+      end
+    end
 
     protected
 
